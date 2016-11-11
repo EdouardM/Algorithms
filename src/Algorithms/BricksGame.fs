@@ -12,6 +12,15 @@ module BricksGame =
     type Result<'T> = 
         | Success of 'T
         | Failure of FailureMessage
+    let bind f = function
+            | Success x -> f x
+            | Failure e -> Failure e
+
+    let map f = function
+            | Success x -> Success(f x)
+            | Failure e -> Failure e
+
+    let (>>=) = bind
 
     type Stack= StackContent of int list
 
@@ -24,9 +33,9 @@ module BricksGame =
     let pop (StackContent l) =
         match l with
             | []    -> Failure "Stack underflow"
-            | x::xs -> Success (x, StackContent xs)
+            | x::rest -> Success (x, StackContent rest)
     
     let remove1 = pop
     let remove2 stack = 
-        pop stack
-        
+        pop
+        >>= snd
