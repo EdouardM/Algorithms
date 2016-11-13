@@ -9,33 +9,30 @@ module MaximumSubAray =
     open System 
 
     let maxSubArray l = 
-        let rec loop (cont: int list) (noncont: int list) acc l =
+        let rec loop (cont, sumCont) (noncont: int list) (acc, sumAcc) l =
             match l with
                 | x::xs ->
                     let newAcc = x::acc
+                    let sumAcc = (sumAcc + x)
                     //Is contigous sum bigger than contigous sum: 
-                    if List.sum newAcc > List.sum cont then
+                    if  sumAcc > sumCont then
                         let noncont' = x::noncont
-                        loop newAcc noncont' newAcc xs
+                        loop (newAcc, sumAcc) noncont' (newAcc, sumAcc) xs
                     //new item bigger than contigous sum:
-                    elif x > List.sum cont then
+                    elif x > sumCont then
                         let noncont' = x::noncont
-                        loop [x] noncont' [x] xs
+                        loop ([x], x) noncont' ([x], x) xs
                     else
-                        loop cont noncont newAcc xs
-                | [] -> (cont, noncont)
+                        loop (cont, sumCont) noncont (newAcc, sumAcc) xs
+                | [] -> ( (cont, sumCont) , noncont)
         
-        let cont, noncont = loop [] [] [] l
+        let ((cont, sumCont) , noncont) = loop ([], 0) [] ([], 0) l
         //If cont still empty (all items negative)
         if List.isEmpty cont then
             //pick the max
             let max = List.max l 
-            ([max], [max])
-        else cont, noncont
-        
-    let solution l = 
-        let cont, noncont = maxSubArray l
-        List.sum cont, List.sum noncont
+            (max, max)
+        else sumCont, List.sum noncont
     let readList() = 
         let n = Console.ReadLine() |> int
         let arr = 
@@ -50,7 +47,7 @@ module MaximumSubAray =
         let t = Console.ReadLine() |> int
         List.init t (fun _ -> 
             let l = readList()
-            let cont, noncont = solution l
+            let cont, noncont = maxSubArray l
             printfn "%d %d" cont noncont
         ) |> ignore
         0
