@@ -9,30 +9,30 @@ module MaximumSubAray =
     open System 
 
     let maxSubArray l = 
-        let rec loop (cont, sumCont) (noncont: int list) (acc, sumAcc) l =
+        let rec loop isEmpty (sumCont: Numerics.BigInteger) (sumNoncont: Numerics.BigInteger) (sumAcc: Numerics.BigInteger) (l: int list) =
             match l with
                 | x::xs ->
-                    let newAcc = x::acc
-                    let sumAcc = (sumAcc + x)
+                    let x' = bigint x
+                    let sumAcc = (sumAcc + x')
                     //Is contigous sum bigger than contigous sum: 
                     if  sumAcc > sumCont then
-                        let noncont' = x::noncont
-                        loop (newAcc, sumAcc) noncont' (newAcc, sumAcc) xs
+                        let sumNoncont = sumNoncont + (x')
+                        loop false (sumAcc) sumNoncont sumAcc xs
                     //new item bigger than contigous sum:
-                    elif x > sumCont then
-                        let noncont' = x::noncont
-                        loop ([x], x) noncont' ([x], x) xs
+                    elif x' > sumCont then
+                        let sumNoncont = sumNoncont + (x')
+                        loop false (x') sumNoncont (x') xs
                     else
-                        loop (cont, sumCont) noncont (newAcc, sumAcc) xs
-                | [] -> ( (cont, sumCont) , noncont)
+                        loop isEmpty sumCont sumNoncont sumAcc xs
+                | [] -> isEmpty , sumCont , sumNoncont
         
-        let ((cont, sumCont) , noncont) = loop ([], 0) [] ([], 0) l
+        let (isEmpty,  sumCont , sumNoncont) = loop true 0I 0I 0I l
         //If cont still empty (all items negative)
-        if List.isEmpty cont then
+        if isEmpty then
             //pick the max
-            let max = List.max l 
+            let max = List.max l |> bigint 
             (max, max)
-        else sumCont, List.sum noncont
+        else sumCont, sumNoncont
     let readList() = 
         let n = Console.ReadLine() |> int
         let arr = 
