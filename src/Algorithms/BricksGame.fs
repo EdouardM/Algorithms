@@ -21,6 +21,7 @@ module BricksGame =
             | Failure e -> Failure e
 
     let (>>=) = bind
+    let (<!>) = map
 
     type Stack= StackContent of int list
 
@@ -36,6 +37,6 @@ module BricksGame =
             | x::rest -> Success (x, StackContent rest)
     
     let remove1 = pop
-    let remove2 stack = 
+    let remove2 = 
         pop
-        >>= snd
+        >> map snd
