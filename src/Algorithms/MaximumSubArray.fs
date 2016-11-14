@@ -14,12 +14,12 @@ module MaximumSubAray =
             match l with
                 | x::xs ->
                     let x' = bigint x
-                    //If positive add to non contigous sum
+                    //If x' positive add to non contigous sum
                     let sumNoncont = if x' >= 0I then sumNoncont + (x') else sumNoncont
 
                     if sumAcc >= 0I then 
                         let sumAcc = (sumAcc + x')
-                        //Is contigous sum bigger than contigous sum: 
+                        //Is acc sum bigger than contigous sum: 
                         if  sumAcc > sumCont then
                             loop (sumAcc) sumNoncont sumAcc xs
                         else
