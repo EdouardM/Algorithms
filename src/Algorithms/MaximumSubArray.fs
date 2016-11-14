@@ -9,30 +9,41 @@ module MaximumSubAray =
     open System 
 
     let maxSubArray l = 
-        let rec loop isEmpty (sumCont: Numerics.BigInteger) (sumNoncont: Numerics.BigInteger) (sumAcc: Numerics.BigInteger) (l: int list) =
+        
+        let rec loop (sumCont: Numerics.BigInteger) (sumNoncont: Numerics.BigInteger) (sumAcc: Numerics.BigInteger) (l: int list) =
             match l with
                 | x::xs ->
                     let x' = bigint x
-                    let sumAcc = (sumAcc + x')
-                    //Is contigous sum bigger than contigous sum: 
-                    if  sumAcc > sumCont then
-                        let sumNoncont = sumNoncont + (x')
-                        loop false (sumAcc) sumNoncont sumAcc xs
+
+                    if sumAcc >= 0I then 
+                        let sumAcc = (sumAcc + x')
+                        //Is contigous sum bigger than contigous sum: 
+                        if  sumAcc > sumCont then
+                            let sumNoncont = sumNoncont + (x')
+                            loop (sumAcc) sumNoncont sumAcc xs
+                        else
+                            loop sumCont sumNoncont sumAcc xs
                     //new item bigger than contigous sum:
                     elif x' > sumCont then
                         let sumNoncont = sumNoncont + (x')
-                        loop false (x') sumNoncont (x') xs
+                        loop (x') sumNoncont (x') xs
                     else
-                        loop isEmpty sumCont sumNoncont sumAcc xs
-                | [] -> isEmpty , sumCont , sumNoncont
+                        loop sumCont sumNoncont sumAcc xs
+                | [] -> sumCont , sumNoncont
         
-        let (isEmpty,  sumCont , sumNoncont) = loop true 0I 0I 0I l
-        //If cont still empty (all items negative)
-        if isEmpty then
+        //If all items negative
+        if List.forall(fun x -> x <= 0) l then
             //pick the max
             let max = List.max l |> bigint 
             (max, max)
-        else sumCont, sumNoncont
+        else 
+            loop 0I 0I 0I l
+
+    //Tests:
+    maxSubArray [-1; 2; -3; 4; 5; -1; 7]
+
+
+
     let readList() = 
         let n = Console.ReadLine() |> int
         let arr = 
@@ -48,6 +59,6 @@ module MaximumSubAray =
         List.init t (fun _ -> 
             let l = readList()
             let cont, noncont = maxSubArray l
-            printfn "%d %d" cont noncont
+            printfn "%A %A" cont noncont
         ) |> ignore
         0
